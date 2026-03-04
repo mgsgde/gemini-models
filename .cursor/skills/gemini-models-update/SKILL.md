@@ -26,7 +26,7 @@ Exact header and column order (keep alignment):
 ```
 
 - **Model**: Exact name from API/Vertex docs (e.g. "Gemini 3.1 Pro", "Gemini 3 Flash"). Use **bold** in Markdown.
-- **Speed**: One of `Low` | `Medium` | `High` | `Very High` (from docs or blog positioning).
+- **Speed**: One of `Low` | `Medium` | `High` | `Very High` | `Ultra` (from docs or blog positioning). Use **Ultra** for Flash-Lite models with ultra-low latency positioning (e.g. Gemini 3.1 Flash-Lite, 2.5 Flash-Lite); keep Gemini 3 Flash and similar Flash models as **Very High** so Flash-Lite correctly appears faster.
 - **Intelligence**: Ordinal ranking 1–10 only. 10 = strongest, 1 = lightest. Relative order from [Artificial Analysis](https://www.artificialanalysis.ai/) where available (exact scores: Gemini 3 Flash, 2.5 Pro); otherwise ordinal by model tier. Flash-Lite: estimate from tier and benchmark deltas; do not invent raw benchmark numbers.
 - **Price**: Approximate list price per 1M input tokens, format `~$X.XX` or `~$X`. Source: [Google AI Pricing](https://ai.google.dev/pricing), [Vertex AI Pricing](https://cloud.google.com/vertex-ai/pricing).
 - **Release**: Release date per model, e.g. "Dec 2024" or "Feb 2025". Source: [Release notes \| Gemini API](https://ai.google.dev/gemini-api/docs/changelog), blog announcements.

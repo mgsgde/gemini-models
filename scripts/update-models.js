@@ -26,7 +26,7 @@ const SOURCES_JSON_PATH = path.join(ROOT, 'sources.json');
 /** !important Always use Gemini 3 Flash Preview. Do not make this configurable via env. */
 const UPDATE_MODEL = 'gemini-3-flash-preview';
 
-const SPEED_TO_NUM = { Low: 1, Medium: 2, High: 3, 'Very High': 4 };
+const SPEED_TO_NUM = { Low: 1, Medium: 2, High: 3, 'Very High': 4, Ultra: 5 };
 
 /** Fallback when no grounding metadata and no sources.json (e.g. first run). */
 const FALLBACK_SOURCES = [
@@ -54,7 +54,7 @@ Schema:
     }
   ]
 }
-- "speed" must be exactly one of: Low, Medium, High, Very High.
+- "speed" must be exactly one of: Low, Medium, High, Very High, Ultra. Use Ultra for Flash-Lite models with ultra-low latency positioning (e.g. Gemini 3.1 Flash-Lite, 2.5 Flash-Lite); keep Gemini 3 Flash and similar as Very High.
 - "priceSort" is numeric for sorting (e.g. 7, 0.7, 0.15).
 - "model" is the exact API/Vertex name (will be rendered bold in the table).
 - "releaseDate": human-readable (e.g. "Dec 2024", "Feb 2025"). "releaseDateSort": YYYYMM number for sorting (e.g. 202412).
