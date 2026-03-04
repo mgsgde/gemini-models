@@ -348,6 +348,27 @@ td:last-child {
   border-radius: var(--radius);
 }
 
+.page-footer .sources ul {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.75rem;
+  margin: 0.5rem 0 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+.page-footer .sources li {
+  margin-bottom: 0;
+  line-height: 1.5;
+}
+
+.page-footer .sources li:not(:last-child)::after {
+  content: ' · ';
+  margin-left: 0.75rem;
+  color: var(--text-muted);
+}
+
 .page-footer h2 {
   font-size: 0.95rem;
   font-weight: 600;
