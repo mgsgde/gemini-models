@@ -9,6 +9,8 @@ Keeps the repository’s Gemini model overview (README.md) in sync with official
 
 **README and docs must always be consistent.** The same content (intro, table, legend, sources, date, license) appears in **README.md** and in **docs/** (GitHub Pages site). When you update the model list or any of that content, update **both** README and docs so they stay in sync.
 
+**Update script model:** The script `scripts/update-models.js` always uses **Gemini 3 Flash Preview** (`gemini-3-flash-preview`). This is intentional and must stay fixed—do not add an environment variable or option to change the model.
+
 ## Where to update
 
 - **README.md** (repository root): Section **"Comparison: All models"** — one table; plus intro, legend, Sources, License & usage, "As of" date.
@@ -19,31 +21,31 @@ Keeps the repository’s Gemini model overview (README.md) in sync with official
 Exact header and column order (keep alignment):
 
 ```markdown
-| Model | Speed | Intelligence (1–10) | Price / 1M tokens (input) | Release | Purpose & use cases |
-|-------|-------|----------------------|----------------------------|---------|----------------------|
+| Model | Speed | Intelligence | Price | Release | Purpose & use cases |
+|-------|-------|----------------------|-------|---------|----------------------|
 ```
 
 - **Model**: Exact name from API/Vertex docs (e.g. "Gemini 3.1 Pro", "Gemini 3 Flash"). Use **bold** in Markdown.
 - **Speed**: One of `Low` | `Medium` | `High` | `Very High` (from docs or blog positioning).
-- **Intelligence (1–10)**: Ordinal ranking only. 10 = strongest, 1 = lightest. Relative order from [Artificial Analysis](https://www.artificialanalysis.ai/) where available (exact scores: Gemini 3 Flash, 2.5 Pro); otherwise ordinal by model tier. Flash-Lite: estimate from tier and benchmark deltas; do not invent raw benchmark numbers.
-- **Price / 1M tokens (input)**: Approximate list price, format `~$X.XX` or `~$X`. Source: [Google AI Pricing](https://ai.google.dev/pricing), [Vertex AI Pricing](https://cloud.google.com/vertex-ai/pricing).
+- **Intelligence**: Ordinal ranking 1–10 only. 10 = strongest, 1 = lightest. Relative order from [Artificial Analysis](https://www.artificialanalysis.ai/) where available (exact scores: Gemini 3 Flash, 2.5 Pro); otherwise ordinal by model tier. Flash-Lite: estimate from tier and benchmark deltas; do not invent raw benchmark numbers.
+- **Price**: Approximate list price per 1M input tokens, format `~$X.XX` or `~$X`. Source: [Google AI Pricing](https://ai.google.dev/pricing), [Vertex AI Pricing](https://cloud.google.com/vertex-ai/pricing).
 - **Release**: Release date per model, e.g. "Dec 2024" or "Feb 2025". Source: [Release notes \| Gemini API](https://ai.google.dev/gemini-api/docs/changelog), blog announcements.
 - **Purpose & use cases**: Short phrase (e.g. "Flagship for complex reasoning, agents, advanced coding").
 
 ## Workflow
 
-1. **Fetch current model set**  
-   Check **Gemini API Model Documentation** and **Vertex AI Model Garden** (see **Sources** below) for the list of current models and their names.
+1. **Fetch full model set**  
+   Check **Gemini API Model Documentation** and **Vertex AI Model Garden** (see **Sources** below) for **all public Gemini models** that are still available. Include every generation that is still offered: 2.0, 2.5, 3.x, etc. Do not limit the table to the latest generation only.
 
 2. **Fill each column** from the right sources:
    - **Model** → API docs or Vertex docs.
    - **Speed, Purpose & use cases** → Vertex Model Garden or blog announcements (1.5, 2.0, 2.5, 3.x).
-   - **Intelligence (1–10)** → Ordinal 1–10 only. Use Artificial Analysis order where published; for others maintain consistent ordinal by tier (Pro > Flash > Flash-Lite within same generation). Do not insert raw MMLU/GPQA into this column.
+   - **Intelligence** → Ordinal 1–10 only. Use Artificial Analysis order where published; for others maintain consistent ordinal by tier (Pro > Flash > Flash-Lite within same generation). Do not insert raw MMLU/GPQA into this column.
    - **Price** → Google AI or Vertex pricing pages; use approximate values and "~".
    - **Release** → Release notes / changelog or blog; use short form (e.g. "Dec 2024").
 
 3. **Keep legend and Sources**  
-   In README: keep the paragraph under the table and the **Sources** section; set the "As of" date (e.g. "March 2026").
+   In README: keep the paragraph under the table and the **Sources** section; set the "As of" date (e.g. "March 2026"). The Sources list is filled from the last Google Search grounding run (or from `sources.json` / fallback when no grounding metadata is returned).
 
 4. **Keep README and docs identical**  
    Update **docs/index.html** so it matches README: same intro, same table (same rows and data attributes for sorting), same legend text, same **Sources** list and date, same **License & usage**. README and docs must always stay consistent.
@@ -69,4 +71,4 @@ Exact header and column order (keep alignment):
 **Announcements (positioning, new models):**  
 https://blog.google/technology/ , https://blog.google/technology/google-deepmind/ — e.g. Gemini 1.5, 2.0, 2.5, 3.x posts.
 
-**Column → source:** Model → API docs / Vertex. Speed, Purpose & use cases → Vertex Model Garden or blog. Intelligence (1–10) → ordinal from Artificial Analysis and model tier. Price → Google AI or Vertex pricing. Release → release notes / changelog or blog.
+**Column → source:** Model → API docs / Vertex. Speed, Purpose & use cases → Vertex Model Garden or blog. Intelligence → ordinal from Artificial Analysis and model tier. Price → Google AI or Vertex pricing. Release → release notes / changelog or blog.

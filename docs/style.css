@@ -197,6 +197,14 @@ th.sortable:hover {
   background: rgba(255, 255, 255, 0.03);
 }
 
+/* Intelligence & Price: allow header to wrap on small screens, but column can grow for readability */
+th:nth-child(3),
+th:nth-child(4) {
+  white-space: normal;
+  line-height: 1.35;
+  min-width: 5rem;
+}
+
 th .sort-icon {
   margin-left: 0.35rem;
   opacity: 0.5;
@@ -227,35 +235,6 @@ tbody tr {
 
 tbody tr:hover {
   background: rgba(255, 255, 255, 0.03);
-}
-
-/* Best price-performance row */
-tbody tr.best-value {
-  background: rgba(129, 201, 149, 0.12);
-  border-left: 3px solid var(--success);
-}
-
-tbody tr.best-value:hover {
-  background: rgba(129, 201, 149, 0.18);
-}
-
-.badge {
-  display: inline-block;
-  font-size: 0.6rem;
-  font-weight: 600;
-  padding: 0.15em 0.4em;
-  border-radius: 3px;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-  vertical-align: middle;
-  margin-left: 0.4rem;
-  white-space: nowrap;
-  line-height: 1.2;
-}
-
-.badge-value {
-  background: var(--success);
-  color: #0f1117;
 }
 
 tbody tr:last-child td {
@@ -299,6 +278,29 @@ td:last-child {
   color: var(--text-muted);
   font-size: 0.875rem;
   max-width: 280px;
+}
+
+/* Footnote below table */
+.legend-footnote {
+  margin-top: 0.5rem;
+  padding: 0;
+  font-size: 0.65rem;
+  line-height: 1.4;
+  color: var(--text-muted);
+}
+
+.legend-footnote strong {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.legend-footnote a {
+  color: var(--link);
+  text-decoration: none;
+}
+
+.legend-footnote a:hover {
+  color: var(--link-hover);
 }
 
 /* Footer */

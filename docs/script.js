@@ -6,36 +6,6 @@
   var tbody = table.querySelector('tbody');
   var headers = table.querySelectorAll('th.sortable');
 
-  /* Mark row with best price-performance (intelligence/price, paid models only) */
-  function markBestValue() {
-    var rows = tbody.querySelectorAll('tr');
-    var bestRow = null;
-    var bestRatio = -1;
-    for (var i = 0; i < rows.length; i++) {
-      var row = rows[i];
-      var price = getCellValue(row, 'price');
-      if (price <= 0) continue;
-      var intelligence = getCellValue(row, 'intelligence');
-      var ratio = intelligence / price;
-      if (ratio > bestRatio) {
-        bestRatio = ratio;
-        bestRow = row;
-      }
-    }
-    if (bestRow) {
-      bestRow.classList.add('best-value');
-      var firstCell = bestRow.querySelector('td');
-      if (firstCell && !firstCell.querySelector('.badge-value')) {
-        var badge = document.createElement('span');
-        badge.className = 'badge badge-value';
-        badge.setAttribute('title', 'Best intelligence per dollar');
-        badge.textContent = 'Best value';
-        firstCell.appendChild(document.createTextNode(' '));
-        firstCell.appendChild(badge);
-      }
-    }
-  }
-
   function getSortKey(th) {
     return th.getAttribute('data-sort');
   }
@@ -58,9 +28,9 @@
   }
 
   function updateHeaderState(activeTh, dir) {
-    headers.forEach(function (th) {
-      th.classList.remove('sort-asc', 'sort-desc');
-      th.setAttribute('aria-sort', 'none');
+    headers.forEach(function (h) {
+      h.classList.remove('sort-asc', 'sort-desc');
+      h.setAttribute('aria-sort', 'none');
     });
     if (activeTh) {
       activeTh.classList.add(dir === 'asc' ? 'sort-asc' : 'sort-desc');
@@ -68,7 +38,16 @@
     }
   }
 
-  var currentSort = { key: null, dir: 'asc' };
+  var currentSort = { key: 'release', dir: 'desc' };
+  var releaseTh = table.querySelector('th[data-sort="release"]');
+
+  function applySort() {
+    sortBy(currentSort.key, currentSort.dir);
+    var activeTh = table.querySelector('th[data-sort="' + currentSort.key + '"]');
+    updateHeaderState(activeTh, currentSort.dir);
+  }
+
+  applySort();
 
   headers.forEach(function (th) {
     th.setAttribute('role', 'button');
@@ -77,10 +56,21 @@
 
     function doSort() {
       var key = getSortKey(th);
-      var dir = currentSort.key === key && currentSort.dir === 'asc' ? 'desc' : 'asc';
-      currentSort = { key: key, dir: dir };
-      sortBy(key, dir);
-      updateHeaderState(th, dir);
+      if (currentSort.key === key) {
+        if (currentSort.dir === 'asc') {
+          currentSort = { key: key, dir: 'desc' };
+          sortBy(key, 'desc');
+          updateHeaderState(th, 'desc');
+        } else {
+          currentSort = { key: 'release', dir: 'desc' };
+          sortBy('release', 'desc');
+          updateHeaderState(releaseTh, 'desc');
+        }
+      } else {
+        currentSort = { key: key, dir: 'asc' };
+        sortBy(key, 'asc');
+        updateHeaderState(th, 'asc');
+      }
     }
 
     th.addEventListener('click', doSort);
@@ -91,6 +81,4 @@
       }
     });
   });
-
-  markBestValue();
 })();

@@ -3,11 +3,13 @@
  * Scheduled update: fetches current Gemini model list via Gemini API (using the
  * gemini-models-update skill rules), then updates README.md and docs/index.html.
  * Uses Google Search grounding so the model can look up current models/pricing from
- * official docs (ai.google.dev, cloud.google.com). Requires a model that supports
- * grounding (e.g. Gemini 1.5+, 2.0, 2.5, 3.x).
- * Thinking budget is set higher for thorough research; thinking is only supported
- * on Gemini 2.5+ and 3.x (set GEMINI_UPDATE_MODEL=gemini-2.5-flash or gemini-2.5-pro to use it).
- * Loads GEMINI_API_KEY (and optional GEMINI_UPDATE_MODEL) from .env in project root if present.
+ * official docs (ai.google.dev, cloud.google.com).
+ *
+ * Model: We always use Gemini 3 Flash Preview (gemini-3-flash-preview). This is
+ * intentional and must not be overridden via environment variable—do not add
+ * GEMINI_UPDATE_MODEL or similar; keep UPDATE_MODEL as the single source of truth.
+ *
+ * Loads GEMINI_API_KEY from .env in project root if present.
  * Usage: npm run update-models  or  GEMINI_API_KEY=... node scripts/update-models.js
  */
 
@@ -19,20 +21,19 @@ const fs = require('fs').promises;
 const SKILL_PATH = path.join(ROOT, '.cursor/skills/gemini-models-update/SKILL.md');
 const README_PATH = path.join(ROOT, 'README.md');
 const DOCS_INDEX_PATH = path.join(ROOT, 'docs/index.html');
+const SOURCES_JSON_PATH = path.join(ROOT, 'sources.json');
+
+/** !important Always use Gemini 3 Flash Preview. Do not make this configurable via env. */
+const UPDATE_MODEL = 'gemini-3-flash-preview';
 
 const SPEED_TO_NUM = { Low: 1, Medium: 2, High: 3, 'Very High': 4 };
 
-/** Source URLs the model must check systematically (via Google Search grounding). */
-const SOURCE_URLS = [
-  'https://ai.google.dev/gemini-api/docs/models',
-  'https://ai.google.dev/gemini-api/docs/changelog',
-  'https://cloud.google.com/vertex-ai/generative-ai/docs/models',
-  'https://cloud.google.com/vertex-ai/pricing',
-  'https://ai.google.dev/pricing',
-  'https://www.artificialanalysis.ai/',
-  'https://ai.google.dev/api',
-  'https://blog.google/technology/',
-  'https://blog.google/technology/google-deepmind/',
+/** Fallback when no grounding metadata and no sources.json (e.g. first run). */
+const FALLBACK_SOURCES = [
+  { url: 'https://ai.google.dev/gemini-api/docs/models', title: 'Models — Gemini API | Google AI for Developers' },
+  { url: 'https://ai.google.dev/gemini-api/docs/changelog', title: 'Release notes | Gemini API' },
+  { url: 'https://cloud.google.com/vertex-ai/generative-ai/docs/models', title: 'Vertex AI Gemini models' },
+  { url: 'https://www.artificialanalysis.ai/', title: 'Artificial Analysis — Intelligence Index' },
 ];
 
 const JSON_OUTPUT_INSTRUCTION = `
@@ -74,24 +75,60 @@ function extractJson(text) {
   return JSON.parse(raw);
 }
 
+/**
+ * Extract source URLs and titles from grounding metadata.
+ * SDK typo: groundingChuncks (not groundingChunks).
+ * @returns { Array<{ url: string, title?: string }> }
+ */
+function extractSourcesFromGrounding(groundingMetadata) {
+  if (!groundingMetadata) return [];
+  const chunks = groundingMetadata.groundingChuncks || groundingMetadata.groundingChunks || [];
+  const seen = new Set();
+  const out = [];
+  for (const chunk of chunks) {
+    const uri = chunk.web?.uri;
+    if (!uri || seen.has(uri)) continue;
+    seen.add(uri);
+    out.push({ url: uri, title: chunk.web?.title || undefined });
+  }
+  return out;
+}
+
+async function loadPersistedSources() {
+  try {
+    const raw = await fs.readFile(SOURCES_JSON_PATH, 'utf8');
+    const data = JSON.parse(raw);
+    return Array.isArray(data.sources) ? data.sources : [];
+  } catch {
+    return [];
+  }
+}
+
+async function writePersistedSources(asOfDate, sources) {
+  await fs.writeFile(
+    SOURCES_JSON_PATH,
+    JSON.stringify({ asOfDate, sources }, null, 2),
+    'utf8'
+  );
+}
+
 async function loadSkill() {
   const content = await fs.readFile(SKILL_PATH, 'utf8');
   return content + '\n\n' + JSON_OUTPUT_INSTRUCTION;
 }
 
-async function callGemini(skillContent) {
+async function callGemini(skillContent, persistedSources = []) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     throw new Error('GEMINI_API_KEY is required');
   }
-  const modelId = process.env.GEMINI_UPDATE_MODEL || 'gemini-2.0-flash';
-
   const { GoogleGenerativeAI } = require('@google/generative-ai');
   const genAI = new GoogleGenerativeAI(apiKey);
-  const supportsThinking = /2\.5|3\./.test(modelId);
+  const supportsThinking = /2\.5|3\./.test(UPDATE_MODEL);
   const model = genAI.getGenerativeModel({
-    model: modelId,
+    model: UPDATE_MODEL,
     systemInstruction: skillContent,
+    tools: [{ googleSearch: {} }],
     ...(supportsThinking && {
       generationConfig: {
         thinkingConfig: { thinkingBudget: 16384 },
@@ -99,12 +136,18 @@ async function callGemini(skillContent) {
     }),
   });
 
-  const sourcesList = SOURCE_URLS.map((u) => `- ${u}`).join('\n');
-  const prompt = `Update the Gemini model comparison table for today.
+  let prompt = `Update the Gemini model comparison table for today.
 
-Go through the following sources systematically (use Google Search for each) and extract the current model list, names, context, pricing, and positioning:
+Include all public Gemini models that are still available (Gemini 2.0, 2.5, 3.x, etc.). Do not limit the table to the latest generation only—list every model offered in the API/Vertex docs.
 
-${sourcesList}
+Use Google Search to find current Gemini/Vertex documentation, pricing pages, Artificial Analysis (intelligence ordering), release notes, and official blog posts.`;
+  if (persistedSources.length > 0) {
+    const hint = persistedSources.map((s) => `- ${s.url}`).join('\n');
+    prompt += `
+
+Previously used sources (verify and update if still relevant):\n${hint}`;
+  }
+  prompt += `
 
 From the API/Vertex docs: model names and context. From the pricing pages: price per 1M input tokens. From Artificial Analysis: intelligence ordering (ordinal 1–10). From the blogs and release notes: new models, use-case positioning, and release date per model (use release notes / changelog for dates). Include "releaseDate" (e.g. "Dec 2024") and "releaseDateSort" (YYYYMM number) for each row.
 
@@ -115,13 +158,14 @@ Return only the JSON object, no other text.`;
   if (!response || !response.text) {
     throw new Error('No text in Gemini response');
   }
-  return response.text();
+  const groundingMetadata = response.candidates?.[0]?.groundingMetadata;
+  return { text: response.text(), groundingMetadata };
 }
 
 function buildReadmeTable(rows) {
   const header =
-    '| Model | Speed | Intelligence (1–10) | Price / 1M tokens (input) | Release | Purpose & use cases |\n' +
-    '|-------|-------|----------------------|----------------------------|---------|----------------------|';
+    '| Model | Speed | Intelligence | Price | Release | Purpose & use cases |\n' +
+    '|-------|-------|----------------------|-------|---------|----------------------|';
   const body = rows
     .map(
       (r) =>
@@ -132,7 +176,33 @@ function buildReadmeTable(rows) {
 }
 
 const LEGEND =
-  '**Intelligence (1–10)** = ordinal ranking (10 = strongest, 1 = lightest). Relative order based on [Artificial Analysis](https://www.artificialanalysis.ai/) and model tier. **Price** = approximate list price per 1M input tokens; check [Google AI](https://ai.google.dev/pricing) or [Vertex AI](https://cloud.google.com/vertex-ai/pricing) for current pricing.';
+  '**Intelligence** = ordinal ranking 1–10 (10 = strongest, 1 = lightest). Relative order based on [Artificial Analysis](https://www.artificialanalysis.ai/) and model tier. **Price** = approximate list price per 1M input tokens; check [Google AI](https://ai.google.dev/pricing) or [Vertex AI](https://cloud.google.com/vertex-ai/pricing) for current pricing.';
+
+function buildSourcesSectionMarkdown(asOfDate, sources) {
+  const list = sources
+    .map((s) => `- [${(s.title || s.url).replace(/\]/g, '\\]')}](${s.url})`)
+    .join('\n');
+  return (
+    '## Sources\n\n' +
+    `Information is based on official Google publications (purpose, context window) and the Artificial Analysis Intelligence Index for the intelligence score. As of ${asOfDate}.\n\n` +
+    list +
+    '\n\n---\n\n'
+  );
+}
+
+function buildSourcesSectionHtml(asOfDate, sources) {
+  const items = sources
+    .map(
+      (s) =>
+        `          <li><a href="${escapeHtml(s.url)}">${escapeHtml(s.title || s.url)}</a></li>`
+    )
+    .join('\n');
+  return (
+    `      <section class="sources">\n        <h2>Sources</h2>\n        <p>Information is based on official Google publications (purpose, context window) and the Artificial Analysis Intelligence Index for the intelligence score. As of ${asOfDate}.</p>\n        <ul>\n` +
+    items +
+    '\n        </ul>\n      </section>'
+  );
+}
 
 function buildHtmlTbody(rows) {
   return rows
@@ -155,7 +225,7 @@ function buildHtmlTbody(rows) {
     .join('\n');
 }
 
-async function updateReadme(data) {
+async function updateReadme(data, sources) {
   const asOfDate = data.asOfDate;
   const table = buildReadmeTable(data.rows);
   const comparisonBlock =
@@ -165,29 +235,38 @@ async function updateReadme(data) {
 
   const comparisonStart = readme.indexOf('## Comparison: All models');
   const sourcesStart = readme.indexOf('\n\n## Sources');
-  if (comparisonStart === -1 || sourcesStart === -1) {
-    throw new Error('README structure changed: could not find Comparison or Sources');
+  const automatedStart = readme.indexOf('\n\n## Automated updates');
+  if (comparisonStart === -1 || sourcesStart === -1 || automatedStart === -1) {
+    throw new Error('README structure changed: could not find Comparison, Sources, or Automated updates');
   }
   readme =
     readme.slice(0, comparisonStart) +
     comparisonBlock +
     readme.slice(sourcesStart);
 
+  const sourcesBlock = buildSourcesSectionMarkdown(asOfDate, sources);
+  const automatedInReadme = readme.indexOf('\n\n## Automated updates');
+  if (automatedInReadme === -1) {
+    throw new Error('README structure changed: could not find ## Automated updates');
+  }
+  readme =
+    readme.slice(0, readme.indexOf('\n\n## Sources')) +
+    '\n\n' +
+    sourcesBlock +
+    readme.slice(automatedInReadme);
+
   readme = readme.replace(
     /\(as of [^)]+\)/i,
     `(as of ${asOfDate})`
-  );
-  readme = readme.replace(
-    /(Information is based on[^.]*\.) As of [^.]*\./,
-    `$1 As of ${asOfDate}.`
   );
 
   await fs.writeFile(README_PATH, readme, 'utf8');
 }
 
-async function updateDocsIndex(data) {
+async function updateDocsIndex(data, sources) {
   const asOfDate = data.asOfDate;
   const tbodyHtml = buildHtmlTbody(data.rows);
+  const sourcesSectionHtml = buildSourcesSectionHtml(asOfDate, sources);
 
   let html = await fs.readFile(DOCS_INDEX_PATH, 'utf8');
 
@@ -197,12 +276,18 @@ async function updateDocsIndex(data) {
   );
 
   html = html.replace(
+    /(Sortable comparison table\. As of )[^.<]+(\.)/,
+    `$1${asOfDate}$2`
+  );
+
+  html = html.replace(
     /(Overview of <strong>all public Google Gemini models<\/strong> \(as of )([^)]+)(\))/,
     `$1${asOfDate}$3`
   );
+
   html = html.replace(
-    /(Information is based on[^.]*\.) As of [^.]*\./,
-    `$1 As of ${asOfDate}.`
+    /<section class="sources">[\s\S]*?<\/section>/,
+    sourcesSectionHtml
   );
 
   await fs.writeFile(DOCS_INDEX_PATH, html, 'utf8');
@@ -210,8 +295,12 @@ async function updateDocsIndex(data) {
 
 async function main() {
   try {
+    const persistedSources = await loadPersistedSources();
     const skillContent = await loadSkill();
-    const rawText = await callGemini(skillContent);
+    const { text: rawText, groundingMetadata } = await callGemini(
+      skillContent,
+      persistedSources
+    );
     const data = extractJson(rawText);
 
     if (!data.rows || !Array.isArray(data.rows) || data.rows.length === 0) {
@@ -221,8 +310,15 @@ async function main() {
       throw new Error('Invalid JSON: missing or invalid "asOfDate"');
     }
 
-    await updateReadme(data);
-    await updateDocsIndex(data);
+    let sources = extractSourcesFromGrounding(groundingMetadata);
+    if (sources.length > 0) {
+      await writePersistedSources(data.asOfDate, sources);
+    } else {
+      sources = persistedSources.length > 0 ? persistedSources : FALLBACK_SOURCES;
+    }
+
+    await updateReadme(data, sources);
+    await updateDocsIndex(data, sources);
 
     console.log('Updated README.md and docs/index.html (as of ' + data.asOfDate + ')');
   } catch (err) {
