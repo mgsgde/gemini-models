@@ -119,6 +119,22 @@ header a.plain-link:hover {
   border: none;
 }
 
+/* Inline links in header intro text: simple blue link, no button */
+header p a {
+  display: inline;
+  margin: 0;
+  padding: 0;
+  background: none;
+  border: none;
+  font-weight: inherit;
+  font-size: inherit;
+}
+
+header p a:hover {
+  background: none;
+  border: none;
+}
+
 main {
   position: relative;
   z-index: 1;
@@ -365,20 +381,113 @@ td:last-child {
   color: var(--link-hover);
 }
 
-.page-footer > p:last-of-type {
-  margin-top: 1.5rem;
+.page-footer-legal {
+  margin: 1.5rem 0 0;
+  font-size: 0.875rem;
+  color: var(--text-muted);
   text-align: center;
 }
 
-.page-footer > p:last-of-type a {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
+.page-footer-legal .page-footer-sep {
   color: var(--text-muted);
-  font-size: 0.875rem;
 }
 
-.page-footer > p:last-of-type a:hover {
+.page-footer-legal .page-footer-made-in {
+  color: var(--text-muted);
+}
+
+.page-footer-legal a {
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.page-footer-legal a:hover {
+  color: var(--link);
+}
+
+/* Other projects: cross-promo section */
+.page-footer-other-projects {
+  margin-top: 1.5rem;
+  padding: 1.25rem 1.5rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.page-footer-other-projects h2 {
+  margin: 0 0 0.75rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.other-projects-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.other-project-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem 1rem;
+  min-width: 0;
+}
+
+.other-project-icon-link {
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  transition: opacity var(--transition);
+}
+
+.other-project-icon-link:hover {
+  opacity: 0.9;
+}
+
+.other-project-icon {
+  display: block;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+}
+
+.other-project-icon-placeholder {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.other-project-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.other-project-text strong {
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.other-project-text > span:not(.other-project-links) {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.other-project-links {
+  font-size: 0.8rem;
+}
+
+.other-project-links a {
   color: var(--link);
 }
 
@@ -399,5 +508,9 @@ td:last-child {
 
   td:last-child {
     max-width: 180px;
+  }
+
+  .other-project-card {
+    flex-wrap: wrap;
   }
 }
