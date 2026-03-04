@@ -39,6 +39,12 @@ Information is based on official Google publications (purpose, context window) a
 
 ---
 
+## Automated updates
+
+A [GitHub Action](.github/workflows/update-models.yml) runs monthly (1st of each month) to refresh the model table using the [gemini-models-update](.cursor/skills/gemini-models-update/SKILL.md) rules and the Gemini API. For the workflow to run, add a repository secret **GEMINI_API_KEY** (get a key from [Google AI Studio](https://aistudio.google.com/app/apikey)). You can also run the update locally: `GEMINI_API_KEY=... npm run update-models`.
+
+---
+
 ## License & usage
 
 This repository is for documentation only. Use of Gemini models is subject to [Google AI / Gemini terms of service](https://ai.google.dev/terms).

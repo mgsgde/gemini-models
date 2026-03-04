@@ -8,7 +8,8 @@
   },
   "scripts": {
     "dev": "five-server docs --port=5500 --open",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "update-models": "node scripts/update-models.js"
   },
   "repository": {
     "type": "git",
@@ -22,6 +23,9 @@
     "url": "https://github.com/mgsgde/gemini-models/issues"
   },
   "homepage": "https://github.com/mgsgde/gemini-models#readme",
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0"
+  },
   "devDependencies": {
     "five-server": "^0.4.5"
   }
