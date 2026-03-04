@@ -5,16 +5,16 @@ description: Updates the Gemini model comparison table in this repo from officia
 
 # Gemini Models List Update
 
-Keeps the repository’s Gemini model overview (README.md) in sync with official Google sources. The list lives in **README.md** as a single Markdown table.
+Keeps the repository’s Gemini model overview in sync with official Google sources. The **comparison table lives only on the website** ([docs/index.html](docs/index.html), GitHub Pages). The **README** has a short intro, link to the website, Sources, Automated updates, and License—no table.
 
-**README and docs must always be consistent.** The same content (intro, table, legend, sources, date, license) appears in **README.md** and in **docs/** (GitHub Pages site). When you update the model list or any of that content, update **both** README and docs so they stay in sync.
+**When updating:** The script updates **docs/index.html** (table, sources, dates) and **README.md** (only the "As of …" date). The README stays minimal and only points to the website.
 
 **Update script model:** The script `scripts/update-models.js` always uses **Gemini 3 Flash Preview** (`gemini-3-flash-preview`). This is intentional and must stay fixed—do not add an environment variable or option to change the model.
 
 ## Where to update
 
-- **README.md** (repository root): Section **"Comparison: All models"** — one table; plus intro, legend, Sources, License & usage, "As of" date.
-- **docs/index.html** (and docs/style.css if needed): Same intro text, same table (with sortable headers), same legend, same **Sources** section (same links and "As of" date), same **License & usage**. Table rows and `data-speed` / `data-intelligence` / `data-price` / `data-release` must match the README table.
+- **docs/index.html** (and docs/style.css if needed): The **comparison table** (sortable), legend footnote, **Sources** section (links and "As of" date), "As of" in header. Table rows and `data-speed` / `data-intelligence` / `data-price` / `data-release` come from the update script.
+- **README.md** (repository root): Minimal: title, link to website, "As of" date, one line on updates, license. No table, no sources list—everything detailed lives on the website.
 
 ## Table format
 

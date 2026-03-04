@@ -357,6 +357,10 @@ td:last-child {
   transition: color var(--transition);
 }
 
+.page-footer .sources a {
+  word-break: break-all;
+}
+
 .page-footer a:hover {
   color: var(--link-hover);
 }

@@ -162,39 +162,11 @@ Return only the JSON object, no other text.`;
   return { text: response.text(), groundingMetadata };
 }
 
-function buildReadmeTable(rows) {
-  const header =
-    '| Model | Speed | Intelligence | Price | Release | Purpose & use cases |\n' +
-    '|-------|-------|----------------------|-------|---------|----------------------|';
-  const body = rows
-    .map(
-      (r) =>
-        `| **${r.model}** | ${r.speed} | ${r.intelligence} | ${r.priceDisplay} | ${r.releaseDate || '—'} | ${r.purpose} |`
-    )
-    .join('\n');
-  return header + '\n' + body;
-}
-
-const LEGEND =
-  '**Intelligence** = ordinal ranking 1–10 (10 = strongest, 1 = lightest). Relative order based on [Artificial Analysis](https://www.artificialanalysis.ai/) and model tier. **Price** = approximate list price per 1M input tokens; check [Google AI](https://ai.google.dev/pricing) or [Vertex AI](https://cloud.google.com/vertex-ai/pricing) for current pricing.';
-
-function buildSourcesSectionMarkdown(asOfDate, sources) {
-  const list = sources
-    .map((s) => `- [${(s.title || s.url).replace(/\]/g, '\\]')}](${s.url})`)
-    .join('\n');
-  return (
-    '## Sources\n\n' +
-    `Information is based on official Google publications (purpose, context window) and the Artificial Analysis Intelligence Index for the intelligence score. As of ${asOfDate}.\n\n` +
-    list +
-    '\n\n---\n\n'
-  );
-}
-
 function buildSourcesSectionHtml(asOfDate, sources) {
   const items = sources
     .map(
       (s) =>
-        `          <li><a href="${escapeHtml(s.url)}">${escapeHtml(s.title || s.url)}</a></li>`
+        `          <li><a href="${escapeHtml(s.url)}"${s.title ? ` title="${escapeHtml(s.title)}"` : ''}>${escapeHtml(s.url)}</a></li>`
     )
     .join('\n');
   return (
@@ -225,41 +197,10 @@ function buildHtmlTbody(rows) {
     .join('\n');
 }
 
-async function updateReadme(data, sources) {
+async function updateReadme(data) {
   const asOfDate = data.asOfDate;
-  const table = buildReadmeTable(data.rows);
-  const comparisonBlock =
-    '## Comparison: All models\n\n' + table + '\n\n' + LEGEND + '\n\n---\n\n';
-
   let readme = await fs.readFile(README_PATH, 'utf8');
-
-  const comparisonStart = readme.indexOf('## Comparison: All models');
-  const sourcesStart = readme.indexOf('\n\n## Sources');
-  const automatedStart = readme.indexOf('\n\n## Automated updates');
-  if (comparisonStart === -1 || sourcesStart === -1 || automatedStart === -1) {
-    throw new Error('README structure changed: could not find Comparison, Sources, or Automated updates');
-  }
-  readme =
-    readme.slice(0, comparisonStart) +
-    comparisonBlock +
-    readme.slice(sourcesStart);
-
-  const sourcesBlock = buildSourcesSectionMarkdown(asOfDate, sources);
-  const automatedInReadme = readme.indexOf('\n\n## Automated updates');
-  if (automatedInReadme === -1) {
-    throw new Error('README structure changed: could not find ## Automated updates');
-  }
-  readme =
-    readme.slice(0, readme.indexOf('\n\n## Sources')) +
-    '\n\n' +
-    sourcesBlock +
-    readme.slice(automatedInReadme);
-
-  readme = readme.replace(
-    /\(as of [^)]+\)/i,
-    `(as of ${asOfDate})`
-  );
-
+  readme = readme.replace(/\bAs of [A-Za-z]+ \d{4}\b/, `As of ${asOfDate}`);
   await fs.writeFile(README_PATH, readme, 'utf8');
 }
 
@@ -317,7 +258,7 @@ async function main() {
       sources = persistedSources.length > 0 ? persistedSources : FALLBACK_SOURCES;
     }
 
-    await updateReadme(data, sources);
+    await updateReadme(data);
     await updateDocsIndex(data, sources);
 
     console.log('Updated README.md and docs/index.html (as of ' + data.asOfDate + ')');
