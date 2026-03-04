@@ -1,45 +1,41 @@
-# Google Gemini 3 & 3.1 Models
+# Public Google Gemini Models
 
-Public overview and comparison of **Google Gemini 3** and **Gemini 3.1** models (as of March 2026). This repository lists and compares all public Gemini 3.x models from Google.
+Overview of **all public Google Gemini models** (as of March 2026), including **Gemini 3 and Gemini 3.1**. Below, every model is compared in a single table by the same criteria.
 
----
-
-## Model Overview (Gemini 3 & 3.1)
-
-| Model | Generation | Category | Purpose | Speed | Intelligence | Context | Typical Use Cases | MMLU | GPQA |
-|-------|------------|----------|---------|-------|--------------|---------|-------------------|------|------|
-| **Gemini 3.1 Pro** | 3.1 | Pro | Flagship for complex reasoning and coding | Low | Very High | 1M tokens | Agentic workflows; advanced coding; long-context/multimodal understanding | 80.5% | 94.3% |
-| **Gemini 3 Flash** | 3.0 | Flash | Frontier reasoning at Flash speed (Pro-grade intelligence) | High | High | 1M tokens | Iterative development; coding and complex analysis; interactive assistants | 81.2% | 90.4% |
-| **Gemini 3.1 Flash-Lite** | 3.1 | Flash-Lite | Cost-efficient, low-latency model for high-volume inference | Very High | High | 1M tokens | Mobile chatbots; IoT/edge assistants; high-throughput API processing | – | – |
-
-*Blank entries = metrics not publicly disclosed by Google.*
+**→ [Website (sortable table)](https://mgsgde.github.io/gemini-models/)** — same content as here, with click-to-sort by Speed, Intelligence, or Price. *(GitHub Pages: Settings → Pages → Source: branch main, folder /docs.)*
 
 ---
 
-## Comparison: Gemini 3.1 Pro vs. 3 Flash vs. 3.1 Flash-Lite
+## Comparison: All models
 
-| Criterion | Gemini 3.1 Pro | Gemini 3 Flash | Gemini 3.1 Flash-Lite |
-|-----------|----------------|----------------|------------------------|
-| **Generation** | 3.1 | 3.0 | 3.1 |
-| **Tier** | Pro (Flagship) | Flash | Flash-Lite |
-| **Speed** | Low (highest quality) | High | Very High |
-| **Intelligence** | Very High | High (Pro-grade) | High |
-| **Context Window** | 1M tokens | 1M tokens | 1M tokens |
-| **MMLU** | 80.5% | 81.2% | – |
-| **GPQA** | 94.3% | 90.4% | – |
-| **Best for** | Agentic tasks, complex coding, long-context | Iterative coding, analysis, assistants | Mobile, IoT, high throughput |
+| Model | Speed | Intelligence (1–10) | Context | Price / 1M tokens (input) | Purpose & use cases |
+|-------|-------|----------------------|---------|----------------------------|----------------------|
+| **Gemini 3.1 Pro** | Low | 10 | 1M | ~$7 | Flagship for complex reasoning, agents, advanced coding |
+| **Gemini 3 Flash** | High | 9 | 1M | ~$0.70 | Fast frontier reasoning, coding, assistants |
+| **Gemini 3.1 Flash-Lite** | Very High | 8 | 1M | ~$0.15 | Ultra-cheap high-volume inference |
+| **Gemini 2.5 Pro** | Low | 7 | 1M | ~$3.50 | Advanced reasoning and coding |
+| **Gemini 2.0 Pro** | Low | 6 | 1M | ~$3 | Experimental flagship for coding |
+| **Gemini 2.5 Flash** | High | 5 | 1M | ~$0.35 | Balanced cost/performance for production |
+| **Gemini 2.0 Flash** | High | 4 | 1M | ~$0.30 | Multimodal chat, RAG, summarization |
+| **Gemini 2.5 Flash-Lite** | Very High | 4 | 1M | ~$0.10 | Massive scale inference |
+| **Gemini 1.5 Pro** | Medium | 3 | 128K | ~$3.50 | Long-context reasoning |
+| **Gemini 1.5 Flash** | High | 2 | 128K | ~$0.35 | Fast chat and transcription |
+| **Gemini 2.0 Flash-Lite** | Very High | 2 | 1M | ~$0.08 | High-volume automation tasks |
+| **Gemini 1.5 Flash-8B** | Very High | 1 | 128K | ~$0.08 | Lightweight large-scale inference |
 
-### Quick recommendation
-
-- **Maximum quality & reasoning** → **Gemini 3.1 Pro**
-- **Fast + high quality (coding, assistants)** → **Gemini 3 Flash**
-- **Cost & latency focus (volume, mobile, edge)** → **Gemini 3.1 Flash-Lite**
+**Intelligence (1–10)** = ordinal ranking (10 = strongest, 1 = lightest). Relative order based on [Artificial Analysis](https://www.artificialanalysis.ai/) and model tier. **Price** = approximate list price per 1M input tokens; check [Google AI](https://ai.google.dev/pricing) or [Vertex AI](https://cloud.google.com/vertex-ai/pricing) for current pricing.
 
 ---
 
 ## Sources
 
-Information is based on official Google publications and documentation for each model (purpose, context window, benchmarks). As of March 2026.
+Information is based on official Google publications (purpose, context window) and the Artificial Analysis Intelligence Index for the intelligence score. As of March 2026.
+
+- [Artificial Analysis — Intelligence Index](https://www.artificialanalysis.ai/) — unified intelligence score (reasoning, coding, knowledge)  
+- [Models — Gemini API | Google AI for Developers](https://ai.google.dev/gemini-api/docs/models) — model overview and capabilities  
+- [Gemini API documentation](https://ai.google.dev/gemini-api/docs) — API reference and guides  
+- [Release notes | Gemini API](https://ai.google.dev/gemini-api/docs/changelog) — model updates and deprecations  
+- [Generative AI on Vertex AI | Google Cloud](https://cloud.google.com/vertex-ai/generative-ai/docs) — Vertex AI model docs and lifecycle
 
 ---
 

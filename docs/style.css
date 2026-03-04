@@ -1,0 +1,135 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.5;
+  color: #24292f;
+  background: #f6f8fa;
+  margin: 0;
+  padding: 1rem;
+}
+
+header {
+  max-width: 960px;
+  margin: 0 auto 1.5rem;
+}
+
+header h1 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin: 0 0 0.25rem;
+}
+
+header p {
+  margin: 0;
+  color: #57606a;
+  font-size: 0.95rem;
+}
+
+main {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.table-wrap {
+  overflow-x: auto;
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid #d0d7de;
+  box-shadow: 0 1px 3px rgba(0,0,0,.06);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+thead {
+  background: #f6f8fa;
+  border-bottom: 2px solid #d0d7de;
+}
+
+th {
+  text-align: left;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+th.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+th.sortable:hover {
+  background: #eaeef2;
+}
+
+th .sort-icon {
+  margin-left: 0.25rem;
+  opacity: 0.4;
+  font-size: 0.75em;
+}
+
+th.sort-asc .sort-icon::after { content: " ↑"; opacity: 1; }
+th.sort-desc .sort-icon::after { content: " ↓"; opacity: 1; }
+
+td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #d0d7de;
+}
+
+tbody tr:hover {
+  background: #f6f8fa;
+}
+
+tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+td:first-child { font-weight: 500; }
+
+main h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 1rem;
+}
+
+.page-footer {
+  margin-top: 1.5rem;
+  font-size: 0.875rem;
+  color: #57606a;
+}
+
+.page-footer .legend {
+  padding: 1rem;
+  background: #fff;
+  border: 1px solid #d0d7de;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.page-footer .sources,
+.page-footer .license {
+  margin-bottom: 1rem;
+}
+
+.page-footer h2 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+  color: #24292f;
+}
+
+.page-footer ul {
+  margin: 0.25rem 0 0;
+  padding-left: 1.25rem;
+}
+
+.page-footer li { margin-bottom: 0.25rem; }
+
+.page-footer a { color: #0969da; text-decoration: none; }
+.page-footer a:hover { text-decoration: underline; }

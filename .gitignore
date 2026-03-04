@@ -8,6 +8,9 @@ Thumbs.db
 *.swp
 *.swo
 
+# Dependencies
+node_modules/
+
 # Env / local
 .env
 .env.local
