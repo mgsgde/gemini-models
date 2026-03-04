@@ -162,11 +162,25 @@ Return only the JSON object, no other text.`;
   return { text: response.text(), groundingMetadata };
 }
 
+/** Short link text for sources: use title if domain-like, else hostname from URL. */
+function sourceLinkText(s) {
+  if (s.title && s.title.length < 60 && !/\s{2,}/.test(s.title)) {
+    const t = s.title.replace(/^https?:\/\//i, '').split('/')[0].replace(/^www\./, '');
+    if (t.length <= 30) return t;
+  }
+  try {
+    const u = new URL(s.url);
+    return u.hostname.replace(/^www\./, '');
+  } catch {
+    return s.url.length > 40 ? s.url.slice(0, 37) + '...' : s.url;
+  }
+}
+
 function buildSourcesSectionHtml(asOfDate, sources) {
   const items = sources
     .map(
       (s) =>
-        `          <li><a href="${escapeHtml(s.url)}"${s.title ? ` title="${escapeHtml(s.title)}"` : ''}>${escapeHtml(s.url)}</a></li>`
+        `          <li><a href="${escapeHtml(s.url)}">${escapeHtml(sourceLinkText(s))}</a></li>`
     )
     .join('\n');
   return (
