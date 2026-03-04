@@ -2,8 +2,8 @@ name: Update model table
 
 on:
   schedule:
-    # Run on the 1st of every month at 00:00 UTC
-    - cron: '0 0 1 * *'
+    # Run every two weeks (1st and 15th) at 00:00 UTC
+    - cron: '0 0 1,15 * *'
   workflow_dispatch:
 
 jobs:
