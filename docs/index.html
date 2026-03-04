@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Public Google Gemini Models</title>
+  <title>Gemini Models</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
-    <h1>Public Google Gemini Models</h1>
-    <p>Overview of <strong>all public Google Gemini models</strong> (as of March 2026), including <strong>Gemini 3 and Gemini 3.1</strong>. Below, every model is compared in a single table; click a column header to sort.</p>
-    <p><a href="https://github.com/mgsgde/gemini-models#readme">README in repo</a></p>
+    <h1>Gemini Models</h1>
+    <p>Sortable comparison table. As of June 2024.</p>
+    <p><a href="https://github.com/mgsgde/gemini-models#readme" class="plain-link">README</a></p>
   </header>
 
   <main>
@@ -22,118 +22,60 @@
             <th>Model</th>
             <th class="sortable" data-sort="speed" data-type="number">Speed <span class="sort-icon" aria-hidden="true"></span></th>
             <th class="sortable" data-sort="intelligence" data-type="number">Intelligence (1–10) <span class="sort-icon" aria-hidden="true"></span></th>
-            <th>Context</th>
             <th class="sortable" data-sort="price" data-type="number">Price / 1M tokens (input) <span class="sort-icon" aria-hidden="true"></span></th>
+            <th class="sortable" data-sort="release" data-type="number">Release <span class="sort-icon" aria-hidden="true"></span></th>
             <th>Purpose & use cases</th>
           </tr>
         </thead>
         <tbody>
-          <tr data-speed="1" data-intelligence="10" data-price="7">
-            <td><strong>Gemini 3.1 Pro</strong></td>
+          <tr data-speed="1" data-intelligence="10" data-price="0" data-release="0">
+            <td><strong>**Gemini 1.0 Ultra**</strong></td>
             <td>Low</td>
             <td>10</td>
-            <td>1M</td>
-            <td>~$7</td>
-            <td>Flagship for complex reasoning, agents, advanced coding</td>
+            <td>Not available</td>
+            <td>TBD</td>
+            <td>Flagship model for complex reasoning and advanced use cases (no longer available)</td>
           </tr>
-          <tr data-speed="3" data-intelligence="9" data-price="0.70">
-            <td><strong>Gemini 3 Flash</strong></td>
-            <td>High</td>
-            <td>9</td>
-            <td>1M</td>
-            <td>~$0.70</td>
-            <td>Fast frontier reasoning, coding, assistants</td>
-          </tr>
-          <tr data-speed="4" data-intelligence="8" data-price="0.15">
-            <td><strong>Gemini 3.1 Flash-Lite</strong></td>
-            <td>Very High</td>
+          <tr data-speed="2" data-intelligence="8" data-price="3.5" data-release="202405">
+            <td><strong>**Gemini 1.5 Pro**</strong></td>
+            <td>Medium</td>
             <td>8</td>
-            <td>1M</td>
-            <td>~$0.15</td>
-            <td>Ultra-cheap high-volume inference</td>
-          </tr>
-          <tr data-speed="1" data-intelligence="7" data-price="3.50">
-            <td><strong>Gemini 2.5 Pro</strong></td>
-            <td>Low</td>
-            <td>7</td>
-            <td>1M</td>
             <td>~$3.50</td>
-            <td>Advanced reasoning and coding</td>
+            <td>May 2024</td>
+            <td>Strong performance and long context window</td>
           </tr>
-          <tr data-speed="1" data-intelligence="6" data-price="3">
-            <td><strong>Gemini 2.0 Pro</strong></td>
-            <td>Low</td>
+          <tr data-speed="3" data-intelligence="7" data-price="0.35" data-release="202405">
+            <td><strong>**Gemini 1.5 Flash**</strong></td>
+            <td>High</td>
+            <td>7</td>
+            <td>~$0.35</td>
+            <td>May 2024</td>
+            <td>Fast and efficient model for high-volume tasks</td>
+          </tr>
+          <tr data-speed="2" data-intelligence="6" data-price="1.4" data-release="202312">
+            <td><strong>**Gemini 1.0 Pro**</strong></td>
+            <td>Medium</td>
             <td>6</td>
-            <td>1M</td>
-            <td>~$3</td>
-            <td>Experimental flagship for coding</td>
+            <td>~$1.40</td>
+            <td>Dec 2023</td>
+            <td>General-purpose model for a wide range of tasks</td>
           </tr>
-          <tr data-speed="3" data-intelligence="5" data-price="0.35">
-            <td><strong>Gemini 2.5 Flash</strong></td>
+          <tr data-speed="3" data-intelligence="5" data-price="0.4" data-release="202405">
+            <td><strong>**Gemini 1.0 Flash**</strong></td>
             <td>High</td>
             <td>5</td>
-            <td>1M</td>
-            <td>~$0.35</td>
-            <td>Balanced cost/performance for production</td>
-          </tr>
-          <tr data-speed="3" data-intelligence="4" data-price="0.30">
-            <td><strong>Gemini 2.0 Flash</strong></td>
-            <td>High</td>
-            <td>4</td>
-            <td>1M</td>
-            <td>~$0.30</td>
-            <td>Multimodal chat, RAG, summarization</td>
-          </tr>
-          <tr data-speed="4" data-intelligence="4" data-price="0.10">
-            <td><strong>Gemini 2.5 Flash-Lite</strong></td>
-            <td>Very High</td>
-            <td>4</td>
-            <td>1M</td>
-            <td>~$0.10</td>
-            <td>Massive scale inference</td>
-          </tr>
-          <tr data-speed="2" data-intelligence="3" data-price="3.50">
-            <td><strong>Gemini 1.5 Pro</strong></td>
-            <td>Medium</td>
-            <td>3</td>
-            <td>128K</td>
-            <td>~$3.50</td>
-            <td>Long-context reasoning</td>
-          </tr>
-          <tr data-speed="3" data-intelligence="2" data-price="0.35">
-            <td><strong>Gemini 1.5 Flash</strong></td>
-            <td>High</td>
-            <td>2</td>
-            <td>128K</td>
-            <td>~$0.35</td>
-            <td>Fast chat and transcription</td>
-          </tr>
-          <tr data-speed="4" data-intelligence="2" data-price="0.08">
-            <td><strong>Gemini 2.0 Flash-Lite</strong></td>
-            <td>Very High</td>
-            <td>2</td>
-            <td>1M</td>
-            <td>~$0.08</td>
-            <td>High-volume automation tasks</td>
-          </tr>
-          <tr data-speed="4" data-intelligence="1" data-price="0.08">
-            <td><strong>Gemini 1.5 Flash-8B</strong></td>
-            <td>Very High</td>
-            <td>1</td>
-            <td>128K</td>
-            <td>~$0.08</td>
-            <td>Lightweight large-scale inference</td>
+            <td>~$0.40</td>
+            <td>May 2024</td>
+            <td>Fast, cost-effective model fine-tuned for speed and efficiency.</td>
           </tr>
         </tbody>
       </table>
     </div>
 
     <footer class="page-footer">
-      <p class="legend"><strong>Intelligence (1–10)</strong> = ordinal ranking (10 = strongest, 1 = lightest). Relative order based on <a href="https://www.artificialanalysis.ai/">Artificial Analysis</a> and model tier. <strong>Price</strong> = approximate list price per 1M input tokens; check <a href="https://ai.google.dev/pricing">Google AI</a> or <a href="https://cloud.google.com/vertex-ai/pricing">Vertex AI</a> for current pricing.</p>
-
       <section class="sources">
         <h2>Sources</h2>
-        <p>Information is based on official Google publications (purpose, context window) and the Artificial Analysis Intelligence Index for the intelligence score. As of March 2026.</p>
+        <p>Information is based on official Google publications (purpose, context window) and the Artificial Analysis Intelligence Index for the intelligence score. As of June 2024.</p>
         <ul>
           <li><a href="https://www.artificialanalysis.ai/">Artificial Analysis — Intelligence Index</a> — unified intelligence score (reasoning, coding, knowledge)</li>
           <li><a href="https://ai.google.dev/gemini-api/docs/models">Models — Gemini API | Google AI for Developers</a> — model overview and capabilities</li>
@@ -141,11 +83,6 @@
           <li><a href="https://ai.google.dev/gemini-api/docs/changelog">Release notes | Gemini API</a> — model updates and deprecations</li>
           <li><a href="https://cloud.google.com/vertex-ai/generative-ai/docs">Generative AI on Vertex AI | Google Cloud</a> — Vertex AI model docs and lifecycle</li>
         </ul>
-      </section>
-
-      <section class="license">
-        <h2>License & usage</h2>
-        <p>This repository is for documentation only. Use of Gemini models is subject to <a href="https://ai.google.dev/terms">Google AI / Gemini terms of service</a>.</p>
       </section>
 
       <p><a href="https://github.com/mgsgde/gemini-models">Source on GitHub</a></p>

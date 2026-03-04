@@ -2,19 +2,38 @@
 /**
  * Scheduled update: fetches current Gemini model list via Gemini API (using the
  * gemini-models-update skill rules), then updates README.md and docs/index.html.
- * Usage: GEMINI_API_KEY=... node scripts/update-models.js
- * Optional: GEMINI_UPDATE_MODEL=gemini-2.0-flash (default)
+ * Uses Google Search grounding so the model can look up current models/pricing from
+ * official docs (ai.google.dev, cloud.google.com). Requires a model that supports
+ * grounding (e.g. Gemini 1.5+, 2.0, 2.5, 3.x).
+ * Thinking budget is set higher for thorough research; thinking is only supported
+ * on Gemini 2.5+ and 3.x (set GEMINI_UPDATE_MODEL=gemini-2.5-flash or gemini-2.5-pro to use it).
+ * Loads GEMINI_API_KEY (and optional GEMINI_UPDATE_MODEL) from .env in project root if present.
+ * Usage: npm run update-models  or  GEMINI_API_KEY=... node scripts/update-models.js
  */
 
-const fs = require('fs').promises;
 const path = require('path');
-
 const ROOT = path.resolve(__dirname, '..');
+require('dotenv').config({ path: path.join(ROOT, '.env') });
+
+const fs = require('fs').promises;
 const SKILL_PATH = path.join(ROOT, '.cursor/skills/gemini-models-update/SKILL.md');
 const README_PATH = path.join(ROOT, 'README.md');
 const DOCS_INDEX_PATH = path.join(ROOT, 'docs/index.html');
 
 const SPEED_TO_NUM = { Low: 1, Medium: 2, High: 3, 'Very High': 4 };
+
+/** Source URLs the model must check systematically (via Google Search grounding). */
+const SOURCE_URLS = [
+  'https://ai.google.dev/gemini-api/docs/models',
+  'https://ai.google.dev/gemini-api/docs/changelog',
+  'https://cloud.google.com/vertex-ai/generative-ai/docs/models',
+  'https://cloud.google.com/vertex-ai/pricing',
+  'https://ai.google.dev/pricing',
+  'https://www.artificialanalysis.ai/',
+  'https://ai.google.dev/api',
+  'https://blog.google/technology/',
+  'https://blog.google/technology/google-deepmind/',
+];
 
 const JSON_OUTPUT_INSTRUCTION = `
 Respond with exactly one JSON object and no other text. No markdown, no code fence.
@@ -26,9 +45,10 @@ Schema:
       "model": "Gemini 3.1 Pro",
       "speed": "Low",
       "intelligence": 10,
-      "context": "1M",
       "priceDisplay": "~$7",
       "priceSort": 7,
+      "releaseDate": "Dec 2024",
+      "releaseDateSort": 202412,
       "purpose": "Flagship for complex reasoning, agents, advanced coding"
     }
   ]
@@ -36,6 +56,7 @@ Schema:
 - "speed" must be exactly one of: Low, Medium, High, Very High.
 - "priceSort" is numeric for sorting (e.g. 7, 0.7, 0.15).
 - "model" is the exact API/Vertex name (will be rendered bold in the table).
+- "releaseDate": human-readable (e.g. "Dec 2024", "Feb 2025"). "releaseDateSort": YYYYMM number for sorting (e.g. 202412).
 `;
 
 function escapeHtml(s) {
@@ -67,14 +88,29 @@ async function callGemini(skillContent) {
 
   const { GoogleGenerativeAI } = require('@google/generative-ai');
   const genAI = new GoogleGenerativeAI(apiKey);
+  const supportsThinking = /2\.5|3\./.test(modelId);
   const model = genAI.getGenerativeModel({
     model: modelId,
     systemInstruction: skillContent,
+    ...(supportsThinking && {
+      generationConfig: {
+        thinkingConfig: { thinkingBudget: 16384 },
+      },
+    }),
   });
 
-  const result = await model.generateContent(
-    'Update the Gemini model comparison table for today. Use the sources and rules in your instructions. Return only the JSON object.'
-  );
+  const sourcesList = SOURCE_URLS.map((u) => `- ${u}`).join('\n');
+  const prompt = `Update the Gemini model comparison table for today.
+
+Go through the following sources systematically (use Google Search for each) and extract the current model list, names, context, pricing, and positioning:
+
+${sourcesList}
+
+From the API/Vertex docs: model names and context. From the pricing pages: price per 1M input tokens. From Artificial Analysis: intelligence ordering (ordinal 1–10). From the blogs and release notes: new models, use-case positioning, and release date per model (use release notes / changelog for dates). Include "releaseDate" (e.g. "Dec 2024") and "releaseDateSort" (YYYYMM number) for each row.
+
+Return only the JSON object, no other text.`;
+
+  const result = await model.generateContent(prompt);
   const response = result.response;
   if (!response || !response.text) {
     throw new Error('No text in Gemini response');
@@ -84,12 +120,12 @@ async function callGemini(skillContent) {
 
 function buildReadmeTable(rows) {
   const header =
-    '| Model | Speed | Intelligence (1–10) | Context | Price / 1M tokens (input) | Purpose & use cases |\n' +
-    '|-------|-------|----------------------|---------|----------------------------|----------------------|';
+    '| Model | Speed | Intelligence (1–10) | Price / 1M tokens (input) | Release | Purpose & use cases |\n' +
+    '|-------|-------|----------------------|----------------------------|---------|----------------------|';
   const body = rows
     .map(
       (r) =>
-        `| **${r.model}** | ${r.speed} | ${r.intelligence} | ${r.context} | ${r.priceDisplay} | ${r.purpose} |`
+        `| **${r.model}** | ${r.speed} | ${r.intelligence} | ${r.priceDisplay} | ${r.releaseDate || '—'} | ${r.purpose} |`
     )
     .join('\n');
   return header + '\n' + body;
@@ -104,13 +140,14 @@ function buildHtmlTbody(rows) {
       const dataSpeed = SPEED_TO_NUM[r.speed] ?? 2;
       const dataIntelligence = Number(r.intelligence);
       const dataPrice = Number(r.priceSort);
+      const dataRelease = Number(r.releaseDateSort) || 0;
       return (
-        `          <tr data-speed="${dataSpeed}" data-intelligence="${dataIntelligence}" data-price="${dataPrice}">\n` +
+        `          <tr data-speed="${dataSpeed}" data-intelligence="${dataIntelligence}" data-price="${dataPrice}" data-release="${dataRelease}">\n` +
         `            <td><strong>${escapeHtml(r.model)}</strong></td>\n` +
         `            <td>${escapeHtml(r.speed)}</td>\n` +
         `            <td>${dataIntelligence}</td>\n` +
-        `            <td>${escapeHtml(r.context)}</td>\n` +
         `            <td>${escapeHtml(r.priceDisplay)}</td>\n` +
+        `            <td>${escapeHtml(r.releaseDate || '—')}</td>\n` +
         `            <td>${escapeHtml(r.purpose)}</td>\n` +
         '          </tr>'
       );

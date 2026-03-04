@@ -24,7 +24,8 @@
   },
   "homepage": "https://github.com/mgsgde/gemini-models#readme",
   "dependencies": {
-    "@google/generative-ai": "^0.21.0"
+    "@google/generative-ai": "^0.21.0",
+    "dotenv": "^16.4.5"
   },
   "devDependencies": {
     "five-server": "^0.4.5"
